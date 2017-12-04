@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
 import firebase from 'firebase';
@@ -14,19 +14,8 @@ import { HomePage } from '../home/home';
 })
 export class Login {
 
-  userProfile: any = null;
-  zone: NgZone;
   constructor(public navCtrl: NavController, private googlePlus: GooglePlus, public loadingCtrl: LoadingController) {
-    this.zone = new NgZone({});
-    firebase.auth().onAuthStateChanged( user => {
-      this.zone.run( () => {
-        if (user){
-          this.userProfile = user;
-        } else { 
-          this.userProfile = null; 
-        }
-      });
-    });
+
   }
 
   presentLoading() {
@@ -38,6 +27,7 @@ export class Login {
   }
 
   loginUser(): void {
+
     this.googlePlus.login({
       'webClientId': '785712574179-ca1gqhggcu8kpiesp7votg95j3n20ia5.apps.googleusercontent.com',
       'offline': true
@@ -45,10 +35,9 @@ export class Login {
       firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(res.idToken))
         .then( success => {
           this.presentLoading();
-          console.log("Firebase success: " + JSON.stringify(success));
-          this.navCtrl.push(HomePage, { "userProfile": this.userProfile });
+          this.navCtrl.push(HomePage);
         })
-        .catch( error => console.log("Firebase failure: " + JSON.stringify(error)));
+        .catch( error => console.log("Firebase fail: " + JSON.stringify(error)));
       }).catch(err => console.error(err));
       
   }
